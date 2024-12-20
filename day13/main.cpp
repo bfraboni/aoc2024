@@ -28,21 +28,22 @@ int main(int argc, char * argv[])
             std::getline(file, line); sscanf(line.c_str(), "Prize: X=%d, Y=%d", &x, &y);
 
             // we parsed a full problem, now just solve it
-            const int64_t det = (ax * by - ay * bx);
-            const int64_t A1 = (x * by - y * bx) / det;
-            const int64_t B1 = (y * ax - x * ay) / det;
-            const bool valid1 = (x == A1 * ax + B1 * bx) && (y == A1 * ay + B1 * by);
+            auto solve = [](int64_t x, int64_t y, int64_t ax, int64_t ay, int64_t bx, int64_t by, int64_t det) -> int64_t
+            {
+                const int64_t A = (x * by - y * bx) / det;
+                const int64_t B = (y * ax - x * ay) / det;
+                const bool valid = (x == A * ax + B * bx) && (y == A * ay + B * by);
+                return valid * (3 * A + B);
+            };
+
             constexpr int64_t offset = 10000000000000;
-            const int64_t A2 = ((x+offset) * by - (y+offset) * bx) / det;
-            const int64_t B2 = ((y+offset) * ax - (x+offset) * ay) / det;
-            const bool valid2 = (x+offset == A2 * ax + B2 * bx) && (y+offset == A2 * ay + B2 * by);
-            part1 += valid1 * (3 * A1 + B1);
-            part2 += valid2 * (3 * A2 + B2);
+            const int64_t det = ax * by - ay * bx;
+            part1 += solve(x, y, ax, ay, bx, by, det);
+            part2 += solve(x+offset, y+offset, ax, ay, bx, by, det);
         }
     }
 
     const double t1 = t.micro().count(); t.reset();
-
     printf("Data loading time: %f µs\n", t1);
     printf("Part 1: %zu\n", part1);
     printf("Part 2: %zu\n", part2);

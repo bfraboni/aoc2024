@@ -15,6 +15,8 @@ size_t concatenate(size_t a, size_t b)
     return a * std::pow(10ul, digits) + b;
 }
 
+struct Result { bool a, b; };
+
 template<bool concat>
 void test(bool& res, const size_t value, const size_t search, const std::vector<size_t>& data, const int depth)
 {
@@ -39,6 +41,34 @@ bool test(const size_t search, const std::vector<size_t>& data)
 {   
     bool res = false;
     test<concat>(res, data.front(), search, data, 1);
+    return res;
+}
+
+
+template<bool concat>
+void test(bool& p1, bool& p2, const size_t value, const size_t search, const std::vector<size_t>& data, const int depth)
+{
+    const bool leaf = depth == data.size();
+    if(!leaf)
+    {
+        test<concat>(p1, p2, value + data[depth], search, data, depth+1); // plus
+        if (res) return; // early exit if the result has been found
+        test<concat>(p1, p2, value * data[depth], search, data, depth+1); // mult
+        if (concat)
+        {
+            if (res) return; // early exit if the result has been found
+            test<concat>(p1, p2, concatenate(value, data[depth]),  search, data, depth+1); // concat
+        }
+    }
+    else
+        res |= (value == search);
+}
+
+template<bool concat>
+bool test(const size_t search, const std::vector<size_t>& data)
+{   
+    bool p1 = false, p2 = false;
+    test<concat>(p1, p2, data.front(), search, data, 1);
     return res;
 }
 
