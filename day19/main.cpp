@@ -8,14 +8,15 @@
 
 struct Solver
 {
-    mutable std::unordered_map<size_t, std::size_t> map;
+    std::vector<size_t> map;
     const std::vector<std::string>& atoms;
     const std::string& target;
 
-    Solver(const std::vector<std::string>& atoms, const std::string& target) : atoms(atoms), target(target) {}
+    Solver(const std::vector<std::string>& atoms, const std::string& target)
+    : atoms(atoms), target(target), map(atoms.size() * target.size(), -1) {}
 
-    // I know it is slow, and some other approaches could do better..
-    inline std::size_t solve(const std::size_t pos = 0) const
+    //! TODO: I know it is slow, and some other approaches could do better, i.e. with a trie.
+    inline std::size_t solve(const std::size_t pos = 0)
     {
         if (pos == target.size()) return 1;
         std::size_t res = 0;
@@ -26,13 +27,9 @@ struct Solver
             if (a == view)
             {
                 const size_t hash = i * target.size() + pos;
-                auto it = map.find(hash);
-                if (it == map.end())
-                {
-                    const size_t nb = solve(pos + a.size());
-                    it = map.emplace(hash, nb).first;
-                }
-                res += it->second;
+                if (map[hash] == size_t(-1))
+                    map[hash] = solve(pos + a.size());
+                res += map[hash];
             }
         }
         return res;
