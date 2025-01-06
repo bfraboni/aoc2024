@@ -4,7 +4,7 @@
 #include <algorithm>
 #include "../common/timer.h"
 
-//! AoC Day 1
+//! AoC Day 1: https://adventofcode.com/2024/day/1
 //! Part 1: find the sum of difference between the sorted pairs of numbers.
 //! Part 2: Calculate a similarity score by adding up each number in the left list
 //!         multiplied by the number of times that number appears in the right list.
@@ -24,7 +24,7 @@ inline size_t solve1(std::vector<int>& left, std::vector<int>& right)
 
 //! NOTE: this only works if the lists are sorted beforehand
 inline size_t solve2(const std::vector<int>& left, const std::vector<int>& right)
-{   
+{
     const size_t size = left.size();
     size_t similarity = 0ul, idl = 0ul, idr = 0ul;
     while(idl < size && idr < size)
@@ -40,7 +40,7 @@ int main(int argc, char * argv[])
 {
     // load data
     Timer t;
-	std::fstream file("input.txt", std::ios_base::in);
+    std::fstream file("input.txt", std::ios_base::in);
     int i, count = 0;
     std::vector<int> left, right;
     while(file >> i)

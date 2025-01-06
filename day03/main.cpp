@@ -4,7 +4,7 @@
 #include <vector>
 #include "../common/timer.h"
 
-// AoC Day 3
+// AoC Day 3: https://adventofcode.com/2024/day/3
 // Part 1: Add up all of the results of the multiplications fo the form 'mul(X,Y)'.
 // Part 2: Now take into account 'do()' and 'don't()' instructions that enable/disable the following operations.
 
@@ -12,6 +12,7 @@ enum Part : bool { One = 0, Two = 1 };
 template<Part part>
 inline size_t solve()
 {
+    // read all file at once
     std::fstream file("input.txt", std::ios_base::in);
     std::stringstream iss;
     iss << file.rdbuf();
@@ -49,11 +50,8 @@ inline size_t solve()
 }
 
 int main(int argc, char * argv[])
-{   
-    // read all data at once
+{
     Timer t;
-
-    // find solution
     const size_t part1 = solve<One>();
     const double t1 = t.micro().count(); t.reset();
     const size_t part2 = solve<Two>();

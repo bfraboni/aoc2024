@@ -6,7 +6,7 @@
 #include <algorithm>
 #include "../common/timer.h"
 
-// AoC Day 5
+// AoC Day 5: https://adventofcode.com/2024/day/5
 // Part 1: Get rules and find valid updates. Sum up the middle page number from them.
 // Part 2: Reorder invalid updates. Sum up the middle page number from them.
 

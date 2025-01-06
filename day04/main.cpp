@@ -4,19 +4,22 @@
 #include <vector>
 #include "../common/timer.h"
 
-// AoC Day 4
+// AoC Day 4: https://adventofcode.com/2024/day/4
 // Part 1: Find all the occurrence of the word XMAS in the grid in any of the 8-star directions (N,E,S,W,NE,NW,SE,SW).
-// Part 2: Find all the X shaped MAS words. 
+// Part 2: Find all the X shaped MAS words.
 
 template<int di, int dj>
 bool check(const std::vector<std::string>& data, const int i, const int j, const int w, const int h)
 {
-    return i+3*di >= 0 && i+3*di < h && j+3*dj >= 0 && j+3*dj < w
-        && data[i+1*di][j+1*dj] == 'M' && data[i+2*di][j+2*dj] == 'A' && data[i+3*di][j+3*dj] == 'S';
+    return i+3*di >= 0 && i+3*di < h
+        && j+3*dj >= 0 && j+3*dj < w
+        && data[i+1*di][j+1*dj] == 'M'
+        && data[i+2*di][j+2*dj] == 'A'
+        && data[i+3*di][j+3*dj] == 'S';
 }
 
 int main(int argc, char * argv[])
-{   
+{
     // read all data at once
     Timer t;
     std::fstream file("input.txt", std::ios_base::in);
@@ -27,8 +30,8 @@ int main(int argc, char * argv[])
 
     // solve puzzles
     const double t1 = t.micro().count(); t.reset();
-    const size_t h = data.size();
-    const size_t w = data[0].size();
+    const int h = data.size();
+    const int w = data[0].size();
     size_t part1 = 0ul, part2 = 0ul;
     for (int i = 0; i < h; ++i)
     for (int j = 0; j < w; ++j)
