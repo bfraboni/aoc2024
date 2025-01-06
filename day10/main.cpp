@@ -7,20 +7,19 @@
 #include "../common/timer.h"
 
 // AoC Day 10
-// Part 1: Find the trails (start with 0 and end with 9 with a constant slope of 1)
-//         and sum of the scores of all trailheads on your topographic map.
-// Part 2:
+// Part 1: Find the trailheads connected to a trailend (start with 0 and end with 9 with a constant slope of 1)
+//         and sum of the scores (number of trailend reachable) of all trailheads on your topographic map.
+// Part 2: Count and sum the ratings of each trailhead, i.e. the number of distinct trails that begins at that trailhead. 
 
 struct Vec2
 {
     int x, y;
-    Vec2() {}
-    Vec2(int x, int y, int dir = 0) : x(x), y(y) {}
-    int index(const int w, const int h) const { return y * w + x; }
-    bool valid(const int w, const int h) const { return x >= 0 && x < w && y >= 0 && y < h; }
-    void print_pos() const { std::cout << "(" << x << " " << y << ")"; }
-    Vec2 operator+(const Vec2& other) const { return Vec2(x+other.x, y+other.y); }
-    Vec2 operator-(const Vec2& other) const { return Vec2(x-other.x, y-other.y); }
+    inline Vec2() {}
+    inline Vec2(int x, int y, int dir = 0) : x(x), y(y) {}
+    inline int index(const int w, const int h) const { return y * w + x; }
+    inline bool valid(const int w, const int h) const { return x >= 0 && x < w && y >= 0 && y < h; }
+    inline Vec2 operator+(const Vec2& other) const { return Vec2(x+other.x, y+other.y); }
+    inline Vec2 operator-(const Vec2& other) const { return Vec2(x-other.x, y-other.y); }
 };
 
 struct Trailhead { size_t score; size_t ratings; };
@@ -65,7 +64,7 @@ inline Trailhead test(const Vec2& start, const std::vector<std::string>& map, st
 }
 
 int main(int argc, char * argv[])
-{   
+{
     using Array = std::vector<Vec2>;
 
     // read all data at once
@@ -86,12 +85,11 @@ int main(int argc, char * argv[])
         map.push_back(line);
         size_t a = 0;
         while (true)
-        {   
-            size_t b = line.find('0', a);
+        {
+            const size_t b = line.find('0', a);
             if (b == std::string::npos) break;
             origins.push_back(Vec2(b, lines-1));
             a = b+1;
-            // origins.back().print_pos();
         }
     }
 

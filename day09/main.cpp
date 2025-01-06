@@ -5,9 +5,9 @@
 #include <cmath>
 #include "../common/timer.h"
 
-// AoC Day 9
+// AoC Day 9: https://adventofcode.com/2024/day/9
 // Part 1: Compress data, take the leftmost blocks and push them back in the front empty space.
-// Part 2:
+// Part 2: Avoid data fragmentation by copying rightmost memory block to the first leftmost empty space of same size.
 
 inline size_t solve1(std::vector<int>& data)
 {
