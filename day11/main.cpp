@@ -6,16 +6,14 @@
 #include <unordered_map>
 #include "../common/timer.h"
 
-// AoC Day 11
+// AoC Day 11: https://adventofcode.com/2024/day/11
 // Part 1: How many stone after blinking 25 times ?
-// Part 2: How many stone after blinking 75 times ? (naive version explodes in complexity)
-
-// fast
+// Part 2: How many stone after blinking 75 times ? (naive version explodes in complexity, needs caching)
 
 std::pair<size_t, size_t> solve(const std::vector<size_t>& data, const std::pair<size_t, size_t>& iterations)
 {
     std::unordered_map<size_t, size_t> mapa, mapb;
-    for (auto i : data) mapa[i] += 1ul;
+    for (auto i : data) mapa[i] += 1ul; // init number on the stones
 
     std::pair<size_t, size_t> result = {0ul, 0ul};
     for (int i = 0; i < iterations.second; ++i)
@@ -23,14 +21,15 @@ std::pair<size_t, size_t> solve(const std::vector<size_t>& data, const std::pair
         auto& in = i%2==0 ? mapa : mapb;
         auto& out = i%2==0 ? mapb : mapa;
         out.clear();
-        size_t total = 0;
+        size_t stones = 0;
+        // apply rules and update stone count in the output map
         for (const auto& p : in)
         {
             //! rule #1
             if (p.first == 0ul)
             {
                 out[1ul] += p.second;
-                total += p.second;
+                stones += p.second;
             }
             else
             {
@@ -41,19 +40,19 @@ std::pair<size_t, size_t> solve(const std::vector<size_t>& data, const std::pair
                     size_t split = std::pow(10ul, digits/2);
                     out[p.first/split] += p.second;
                     out[p.first%split] += p.second;
-                    total += 2ul * p.second;
+                    stones += 2ul * p.second;
                 }
                 //! rule #3
                 else
                 {
                     out[p.first * 2024ul] += p.second;
-                    total += p.second;
+                    stones += p.second;
                 }
             }
         }
 
-        if (i == iterations.first-1) result.first = total;
-        else if (i == iterations.second-1) result.second = total;
+        if (i == iterations.first-1) result.first = stones;
+        else if (i == iterations.second-1) result.second = stones;
     }
 
     return result;
