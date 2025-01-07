@@ -8,8 +8,8 @@
 #include "../common/timer.h"
 
 // AoC Day 12: https://adventofcode.com/2024/day/12
-// Part 1: Walls and equivalence class.. Union Find
-// Part 2:
+// Part 1: Walls and equivalence class.. Union Find; compute fences cost as area * perimeter and sum for each region. 
+// Part 2: Compute fences cost as area * corners and sum for each region.
 
 struct Vec2
 {
