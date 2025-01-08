@@ -5,13 +5,13 @@
 #include <cstring>
 #include "../common/timer.h"
 
-// AoC Day 14
+// AoC Day 14: https://adventofcode.com/2024/day/14
 // Part 1:
 // Part 2:
 
-inline int mod(int i, int n) { return (i % n + n) % n; }
+inline int mod(const int i, const int n) { return (i % n + n) % n; }
 
-inline float var(int array[], int size)
+inline float var(const int array[], const int size)
 {
     float mean = 0, var = 0;
     for(int i = 0; i < size; i++)
@@ -26,7 +26,6 @@ struct Robot { int px, py, vx, vy; };
 
 int main(int argc, char * argv[])
 {   
-    // read all data at once
     Timer t;
     std::fstream file("input.txt", std::ios_base::in);
     std::string line;
@@ -64,13 +63,12 @@ int main(int argc, char * argv[])
             const int pyt = mod(r.py + t * r.vy, height); yi[pyt] += 1;
         }
 
-        // find the time with highest variance in Y
+        // find the time with highest variance in X
         const float lvx = var(xi, 101);
         if (t < 101 && lvx > vx)
         {
             vx = lvx;
             xtime = t;
-            // printf("found xtime: %d var %f \n", xtime, lvx);
         }
         // find the time with highest variance in Y
         const float lvy = var(yi, 103);
@@ -78,12 +76,10 @@ int main(int argc, char * argv[])
         {
             vy = lvy;
             ytime = t;
-            // printf("found ytime: %d var %f \n", ytime, lvy);
         }
     }
-    const size_t part2 = (5253 * xtime + 5151 * ytime) % (width * height);
+    const size_t part2 = (5253 * xtime + 5151 * ytime) % (width * height); // chinese remainder theorem
     const double t2 = t.micro().count(); t.reset();
-
     printf("Part 1: %zu, Time: %f µs\n", part1, t1);
     printf("Part 2: %zu, Time: %f µs\n", part2, t2);
     return 0;

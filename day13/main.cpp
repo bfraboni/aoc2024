@@ -6,13 +6,20 @@
 #include <unordered_map>
 #include "../common/timer.h"
 
-// AoC Day 13
+// AoC Day 13: https://adventofcode.com/2024/day/13
 // Part 1:
 // Part 2:
 
+inline int64_t solve(int64_t x, int64_t y, int64_t ax, int64_t ay, int64_t bx, int64_t by, int64_t det)
+{
+    const int64_t A = (x * by - y * bx) / det;
+    const int64_t B = (y * ax - x * ay) / det;
+    const bool valid = (x == A * ax + B * bx) && (y == A * ay + B * by);
+    return valid * (3 * A + B);
+}
+
 int main(int argc, char * argv[])
 {   
-    // read all data at once
     Timer t;
     std::fstream file("input.txt", std::ios_base::in);
     std::string line;
@@ -26,16 +33,6 @@ int main(int argc, char * argv[])
         {
             std::getline(file, line); sscanf(line.c_str(), "Button B: X+%d, Y+%d", &bx, &by);
             std::getline(file, line); sscanf(line.c_str(), "Prize: X=%d, Y=%d", &x, &y);
-
-            // we parsed a full problem, now just solve it
-            auto solve = [](int64_t x, int64_t y, int64_t ax, int64_t ay, int64_t bx, int64_t by, int64_t det) -> int64_t
-            {
-                const int64_t A = (x * by - y * bx) / det;
-                const int64_t B = (y * ax - x * ay) / det;
-                const bool valid = (x == A * ax + B * bx) && (y == A * ay + B * by);
-                return valid * (3 * A + B);
-            };
-
             constexpr int64_t offset = 10000000000000;
             const int64_t det = ax * by - ay * bx;
             part1 += solve(x, y, ax, ay, bx, by, det);
@@ -44,7 +41,7 @@ int main(int argc, char * argv[])
     }
 
     const double t1 = t.micro().count(); t.reset();
-    printf("Data loading time: %f µs\n", t1);
+    printf("Time: %f µs\n", t1);
     printf("Part 1: %zu\n", part1);
     printf("Part 2: %zu\n", part2);
     return 0;

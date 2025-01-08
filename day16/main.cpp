@@ -9,7 +9,7 @@
 #include <unordered_set>
 #include "../common/timer.h"
 
-// AoC Day 16
+// AoC Day 16: https://adventofcode.com/2024/day/16
 // Part 1:
 // Part 2:
 
@@ -34,10 +34,10 @@ struct Vec2
 struct Node
 {
     Vec2 p;
-    int visit    = 0;
-    int cost     = 1 << 30;
-    int psize    = 0;
-    int prevs[6] = {-1};
+    int cost        = 1 << 30;
+    int visit       = 0;
+    int psize       = 0;
+    int prevs[6]    = {-1};
 
     inline void add(const int n) { prevs[psize++] = n; }
     inline void reset() { psize = 0; }
@@ -76,7 +76,7 @@ inline std::pair<size_t, size_t> solve(const std::vector<std::string>& map, cons
 
     // init
     const int startid = start.hash(w, h);
-    nodes[startid] = { start, 0, 0ul };
+    nodes[startid] = { start, 0, 0 };
     queue.push(startid);
 
     // BFS
@@ -99,10 +99,10 @@ inline std::pair<size_t, size_t> solve(const std::vector<std::string>& map, cons
             const int nhash = next.hash(w, h);
             const bool validnext = map[next.y][next.x] != '#';
             if (validnext)
-            {   
+            {
                 if (n.cost + cost < nodes[nhash].cost)
                 {
-                    nodes[nhash] = { next, nodes[nhash].visit, n.cost + cost };
+                    nodes[nhash] = { next, n.cost + cost, nodes[nhash].visit };
                     // we found a better route, reset list of previous best nodes
                     nodes[nhash].reset_and_add(hash);
                     if (!nodes[nhash].visit)
@@ -128,7 +128,7 @@ inline std::pair<size_t, size_t> solve(const std::vector<std::string>& map, cons
 }
 
 int main(int argc, char * argv[])
-{   
+{
     // read all data at once
     Timer t;
     std::fstream file("input.txt", std::ios_base::in);
@@ -148,7 +148,8 @@ int main(int argc, char * argv[])
     const double t2 = t.micro().count(); t.reset();
     
     printf("Data loading time: %f µs\n", t1);
-    printf("Part 1: %zu, Time: %f µs\n", res.first, t2);
-    printf("Part 2: %zu, Time: %f µs\n", res.second, t2);
+    printf("Part 1: %zu\n", res.first);
+    printf("Part 2: %zu\n", res.second);
+    printf("Time: %f µs\n", t2);
     return 0;
 }

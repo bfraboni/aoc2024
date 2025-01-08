@@ -27,7 +27,7 @@ struct PRNG
         state ^= (state << 6);
         state = state % 16777216;
         state ^= (state >> 5);
-        state = state % 16777216;
+        // state = state % 16777216; // because state has decreased, we don't need the modulo 
         state ^= (state << 11);
         state = state % 16777216;
         return state;
@@ -35,16 +35,16 @@ struct PRNG
 };
 
 int main(int argc, char * argv[])
-{   
+{
     Timer t;
     std::fstream file("input.txt", std::ios_base::in);
-    size_t part1 = 0ul, num, best = 0ul /* , best_hash = -1 */;
+    size_t part1 = 0ul, num, best = 0ul;
     std::unordered_map<int, int> map;
     std::unordered_set<int> set;
     map.reserve(65536);
     set.reserve(2048);
     while(file >> num)
-    {   
+    {
         PRNG prng(num);
         int price = num % 10, diffs[4];
         set.clear();
@@ -57,7 +57,6 @@ int main(int argc, char * argv[])
             // adding 9 makes the difference always positive
             diffs[i%4] = 9 + new_price - price;
             price = new_price;
-            // printf("%zu: %zd (%zd)\n", prng.state, new_price, diffs[i%4]);
             if (i >= 3) // circular buffer is full now
             {
                 // compute unique hash from the 4 positive diffs index

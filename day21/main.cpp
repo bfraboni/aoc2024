@@ -169,7 +169,7 @@ inline const Cell& dircell(const char& c)
 
 inline size_t solve(std::string seq, int8_t depth, std::unordered_map<size_t, size_t>& cache)
 {
-    if (depth == 0) { printf("solved %s \n", seq.c_str()); return seq.size(); }
+    if (depth == 0) { /*printf("solved %s \n", seq.c_str());*/ return seq.size(); }
 
     size_t res = 0;
     seq = 'A' + seq;
@@ -240,7 +240,6 @@ int main(int argc, char * argv[])
                 // const size_t v22 = solve(numroutes.at(hash2), 2, cache);
                 // printf(" @2 #1 %s -> %zu \n", numroutes.at(hash1).c_str(), v11);
                 // printf(" @2 #2 %s -> %zu \n", numroutes.at(hash2).c_str(), v22);
-
 
                 best2 += std::min(
                     solve(numroutes.at(hash1), 25, cache),

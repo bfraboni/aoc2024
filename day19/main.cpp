@@ -45,22 +45,16 @@ int main(int argc, char * argv[])
     std::vector<std::string> atoms, designs;
     size_t part1 = 0ul, part2 = 0ul;
     while(std::getline(file, line))
-    {   
+    {
         if (line.find(',') != std::string::npos)
         {
             line.erase(std::remove(line.begin(), line.end(), ' '), line.end()); // remove spaces
             std::istringstream iss(line);
             while(std::getline(iss, atom, ','))
-            {
-                // printf("atom: '%s'\n", atom.c_str());
                 atoms.push_back(atom);
-            }
         }
         else if (!line.empty())
-        {
             designs.push_back(line);
-            // printf("check: '%s' possible: %zu\n", line.c_str(), nb);
-        }
     }
 
     const double t1 = t.micro().count(); t.reset();
@@ -69,7 +63,7 @@ int main(int argc, char * argv[])
     {
         Solver s(atoms, line);
         const size_t nb = s.solve();
-        part1 += (nb>0);
+        part1 += (nb > 0);
         part2 += nb;
     }
 

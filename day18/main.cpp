@@ -104,7 +104,6 @@ int main(int argc, char * argv[])
         Vec2 pos; char c;
         iss >> pos.x >> c >> pos.y;
         coords.push_back(pos);
-        // std::cout << line << " " << coords.size() << std::endl;
     }
 
     constexpr int w = 71, h = 71;
@@ -112,16 +111,13 @@ int main(int argc, char * argv[])
     for (int i = 0; i < 1024; ++i)
         memory[coords[i].y][coords[i].x] = '#';
     
-    // for (const auto& s : memory)
-    //     std::cout << s << std::endl;
-
     const double t1 = t.micro().count(); t.reset();
     const size_t part1 = solve(memory);
     const double t2 = t.micro().count(); t.reset();
 
     // binary search the first non working byte
     int a = 1024, b = coords.size();
-    while(a+1 < b)
+    while(a + 1 < b)
     {
         const int m = (a+b)/2;
         // init map up to m-th byte
@@ -132,12 +128,10 @@ int main(int argc, char * argv[])
         constexpr int fail = 1 << 30;
         if (solve(memory) == fail)
         {
-            // printf("test a: %d b: %d m: %d fail\n", a, b, m);
             b = m;
         }
         else
         {
-            // printf("test a: %d b: %d m: %d succ\n", a, b, m);
             a = m;
         }
     }

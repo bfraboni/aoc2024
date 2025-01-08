@@ -36,15 +36,17 @@ inline int solve(     Vertices&& R
         }
         return max;
     }
-    // early quit if there remains not enough nodes
+    // early quit if there remains not enough nodes to make
+    // a clique greater than the current max 
     else if (P.count() + R.count() < max)
         return max;
 
+    int id = 0; 
     while (P.any())
     {
         Vertices nextR = R, nextP, nextX;
-        int id = 0; while(!P.test(id)) id++; // find first vertex in P
-        // printf("P[%d] = %d, cliques %zu\n", id, (int)P.test(id), cliques.size());
+        while(!P.test(id)) id++; // find first vertex in P
+
         nextR.set(id, true);
         for (int i = 0; i < gsize; ++i)
         {
@@ -53,7 +55,7 @@ inline int solve(     Vertices&& R
         }
         const int count = solve(std::move(nextR), std::move(nextP), std::move(nextX), graph, cliques, max);
         if (count > max) max = count;
-        // printf("after solve cliques %zu\n", cliques.size());
+
         P.set(id, false);
         X.set(id, true);
     }
