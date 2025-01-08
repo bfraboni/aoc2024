@@ -8,9 +8,10 @@
 #include <queue>
 #include "../common/timer.h"
 
-// AoC Day 14
-// Part 1:
-// Part 2:
+// AoC Day 15: https://adventofcode.com/2024/day/15
+// Part 1: Move the robot "@" and push the boxes "O" along his path if possible. Compute the sum of box indices.
+// Part 2: Update the map such that it is twice a wide, but the moves are still of size one.
+//         Move the robot through that new map. Compute the sum of box indices.
 
 enum Dir { Top = 0, Bottom = 1, Left = 2, Right = 3 };
 
@@ -26,11 +27,11 @@ struct Vec2
     inline Vec2 operator+(const Vec2& other) const { return Vec2(x+other.x, y+other.y); }
     inline Vec2 operator-(const Vec2& other) const { return Vec2(x-other.x, y-other.y); }
 
-    inline Vec2 next(const char c) const {
-        if (c == '^') return Vec2(x, y-1);
-        else if (c == 'v') return Vec2(x, y+1);
-        else if (c == '>') return Vec2(x+1, y);
-        else return Vec2(x-1, y);
+    inline Vec2 next(const char& c) const {
+        if (c == '^')       return Vec2(x, y-1);
+        else if (c == 'v')  return Vec2(x, y+1);
+        else if (c == '>')  return Vec2(x+1, y);
+        else                return Vec2(x-1, y);
     }
 
     template<Dir d>
@@ -42,9 +43,9 @@ struct Vec2
     }
 };
 
-bool push(std::vector<std::string>& map, const Vec2& pos, const char dir)
+inline bool push(std::vector<std::string>& map, const Vec2& pos, const char& dir)
 {
-    if (map[pos.y][pos.x] == '.') return true;
+    if      (map[pos.y][pos.x] == '.') return true;
     else if (map[pos.y][pos.x] == 'O')
     {
         const Vec2 next = pos.next(dir);
@@ -68,7 +69,7 @@ struct Part2
 
     Part2(std::vector<std::string>& map) : map(map), width(map[0].size()), height(map.size()) {}
 
-    inline bool compare(const Vec2& pos, const char c) const { return map[pos.y][pos.x] == c; }
+    inline bool compare(const Vec2& pos, const char& c) const { return map[pos.y][pos.x] == c; }
 
     inline bool move(const Vec2& pos, const char dir)
     {
@@ -80,7 +81,7 @@ struct Part2
             case 'v': push = pushable<Bottom>(pos); break;
             case '>': push = pushable<Left>(pos);   break;
             case '<': push = pushable<Right>(pos);  break;
-        };
+        }
         if (push)
         {
             // apply push chain
@@ -104,14 +105,14 @@ struct Part2
     template<Dir d>
     inline bool pushable(const Vec2& pos/*, const char dir*/)
     {
-        if (compare(pos, '.'))      return true;
+        if      (compare(pos, '.')) return true;
         else if (compare(pos, '#')) return false;
         else if (compare(pos, '[') | compare(pos, ']'))
         {
-            const Vec2& left = compare(pos, '[') ? pos : Vec2(pos.x-1, pos.y);
+            const Vec2& left = compare(pos, '[') ? pos : pos.next<Right>();
             const Vec2 right(left.x+1, left.y), nextleft = left.next<d>(), nextright = right.next<d>();
             bool test = false;
-            if constexpr (d == Left)        test = pushable<d>(nextright);
+            if      constexpr (d == Left)   test = pushable<d>(nextright);
             else if constexpr (d == Right)  test = pushable<d>(nextleft);
             else    test = pushable<d>(nextleft) & pushable<d>(nextright);
             if (test)
@@ -157,7 +158,6 @@ int main(int argc, char * argv[])
 
             // populate map for part2
             line2.clear();
-            line2.reserve(2 * line.size());
             int i = 0;
             for (const char& c : line)
             {
@@ -188,13 +188,13 @@ int main(int argc, char * argv[])
         }
     };
 
-    auto eval = [](const std::vector<std::string>& map)
+    auto eval = [](const std::vector<std::string>& map, const char& box)
     {
         size_t res = 0ul;
         const int w = map[0].size(), h = map.size();
         for (int i = 0; i < h; ++i)
             for (int j = 0; j < w; ++j)
-                res += bool(map[i][j] == '[') * (100 * i + j);
+                res += bool(map[i][j] == box) * (100 * i + j);
         return res;
     };
 
@@ -207,7 +207,7 @@ int main(int argc, char * argv[])
         if (push(map, next, move))
             robot = next;
     }
-    const size_t part1 = eval(map);
+    const size_t part1 = eval(map, 'O');
     const double t2 = t.micro().count(); t.reset();
 
     // part 2
@@ -218,7 +218,7 @@ int main(int argc, char * argv[])
         if (p2.move(next2, move))
             robot2 = next2;
     }
-    const size_t part2 = eval(map2);
+    const size_t part2 = eval(map2, '[');
     const double t3 = t.micro().count(); t.reset();
 
     printf("Data loading time: %f µs\n", t1);
