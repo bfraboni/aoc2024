@@ -1,6 +1,8 @@
 #!/bin/python
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sbn
+sbn.set_theme()
 
 # collected averaged times for each day:
 times = [
