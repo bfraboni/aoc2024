@@ -45,7 +45,7 @@ inline int solve(     Vertices&& R
     while (P.any())
     {
         Vertices nextR = R, nextP, nextX;
-        while(!P.test(id)) id++; // find first vertex in P
+        while(!P.test(id)) id++; // find next vertex in P
 
         nextR.set(id, true);
         for (int i = 0; i < gsize; ++i)

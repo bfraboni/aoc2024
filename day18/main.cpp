@@ -20,7 +20,7 @@ struct Vec2
     inline int index(const int w, const int h) const { return y * w + x; }
     inline bool valid(const int w, const int h) const { return x >= 0 && x < w && y >= 0 && y < h; }
     inline Vec2 next(Dir d) const { return Vec2(x+dx[d], y+dy[d]); }
-    bool operator==(const Vec2& other) const { return x==other.x && y==other.y; }
+    inline bool operator==(const Vec2& other) const { return x==other.x && y==other.y; }
 };
 
 struct Node

@@ -21,16 +21,17 @@ struct Command
     std::string stra, strb, stro;
     int8_t op;
     int id;
+    int ia, ib, io;
 };
 
 // https://en.wikipedia.org/wiki/Adder_(electronics)#/media/File:Halfadder.gif
-// struct HalfAdder
-// {
-//     bool a, b;
-//     HalfAdder(bool a, bool b) : a(a), b(b) {}
-//     inline bool out()      const { return a ^ b; }
-//     inline bool carry()    const { return a & b; }
-// };
+struct HalfAdder
+{
+    bool a, b;
+    HalfAdder(bool a, bool b) : a(a), b(b) {}
+    inline bool out()      const { return a ^ b; }
+    inline bool carry()    const { return a & b; }
+};
 
 // https://en.wikipedia.org/wiki/Adder_(electronics)#/media/File:Fulladder.gif
 struct FullAdder
@@ -45,6 +46,7 @@ struct FullAdder
 
 std::vector<Command> apply(std::queue<Command>& commands, std::unordered_map<std::string, bool>& map)
 {
+    constexpr bool verbose = false;
     std::vector<Command> ordered;
     while(!commands.empty())
     {
@@ -57,7 +59,8 @@ std::vector<Command> apply(std::queue<Command>& commands, std::unordered_map<std
             else if (c.op == AND)   map[c.stro] = map[c.stra] & map[c.strb];
             else if (c.op == XOR)   map[c.stro] = map[c.stra] ^ map[c.strb];
             ordered.push_back(c);
-            std::cout << "\t" << c.stro << " = " << c.stra << to_string((Op)c.op) << c.strb << std::endl;
+            if constexpr (verbose)
+                std::cout << "\t" << c.stro << " = " << c.stra << to_string((Op)c.op) << c.strb << std::endl;
         }
         else
         {
@@ -69,8 +72,20 @@ std::vector<Command> apply(std::queue<Command>& commands, std::unordered_map<std
     return ordered;
 }
 
+std::string to_string(int id)
+{
+    std::string out(3, ' ');
+    out[2] = char(id >> 16);    id -= int(out[2]) << 16;
+    out[1] = char(id >> 8);     id -= int(out[1]) << 8;
+    out[0] = char(id);
+    return out;
+}
+int to_int(const std::string& str) { return int(str[0]) + (int(str[1]) << 8) + (int(str[2]) << 16); }
+int to_int(const char str[]) { return int(str[0]) + (int(str[1]) << 8) + (int(str[2]) << 16); }
+
 int main(int argc, char * argv[])
 {
+    constexpr bool verbose = false;
     Timer t;
     std::fstream file("input.txt", std::ios_base::in);
     std::unordered_map<std::string, bool> map;
@@ -97,6 +112,16 @@ int main(int argc, char * argv[])
             else if (op[0] == 'A')  commands.push({first, second, stro, AND, id++ });
             else if (op[0] == 'X')  commands.push({first, second, stro, XOR, id++ });
             if (stro[0] == 'z') zs.insert(stro);
+
+
+            if constexpr (verbose)
+            {
+                std::cout << "stra: " << stra << std::endl;
+                std::cout << "int stra: "<< to_int(stra) << std::endl;
+                std::cout << "int a: "<< to_int(a) << std::endl;
+                std::cout << "string int stra: "<< to_string(to_int(stra)) << std::endl;
+                std::cout << "string int a: "<< to_string(to_int(a)) << std::endl;
+            }
         }
     }
 
@@ -115,15 +140,18 @@ int main(int argc, char * argv[])
     {
         const bool cin = add.carry();
         add.init(map[vx[i]], map[vy[i]], cin);
-        printf("ci %d x %d y %d s %d co %d : z %d : %s\n",
-            (int) cin
-            ,(int) map[vx[i]]
-            ,(int) map[vy[i]]
-            ,(int) add.out()
-            ,(int) add.carry()
-            ,(int) map[vz[i]]
-            , (map[vz[i]] == add.out() ? " correct" : " incorrect")
-        );
+        if constexpr (verbose)
+        {
+            printf("ci %d x %d y %d s %d co %d : z %d : %s\n",
+                (int) cin
+                ,(int) map[vx[i]]
+                ,(int) map[vy[i]]
+                ,(int) add.out()
+                ,(int) add.carry()
+                ,(int) map[vz[i]]
+                , (map[vz[i]] == add.out() ? " correct" : " incorrect")
+            );
+        }
 
         // gather all operations related to the current output bit
         std::vector<Command> fulladd;
@@ -132,7 +160,8 @@ int main(int argc, char * argv[])
         {
             if (c.stra == vx[i] || c.strb == vx[i] || c.stra == vy[i] || c.strb == vy[i])
             {
-                std::cout << "\t" << c.stro << " = " << c.stra << to_string((Op)c.op) << c.strb << std::endl;
+                if constexpr (verbose)
+                    std::cout << "\t" << c.stro << " = " << c.stra << to_string((Op)c.op) << c.strb << std::endl;
                 fulladd.push_back(c);
 
                 if (i > 0) // half adder for bit 1
@@ -141,7 +170,8 @@ int main(int argc, char * argv[])
                     {
                         if (c2.stra == c.stro || c2.strb == c.stro)
                         {
-                            std::cout << "\t" << c2.stro << " = " << c2.stra << to_string((Op)c2.op) << c2.strb << std::endl;
+                            if constexpr (verbose)
+                                std::cout << "\t" << c2.stro << " = " << c2.stra << to_string((Op)c2.op) << c2.strb << std::endl;
                             fulladd.push_back(c2);
                             if (c2.stro[0] == 'z') last = fulladd.size()-1;
                         }
@@ -156,7 +186,8 @@ int main(int argc, char * argv[])
         // if (map[vz[i]] != add.out())
         {
             // validation
-            printf("\t--- correction ---\n");
+            if constexpr (verbose)
+                printf("\t--- correction ---\n");
             std::string swapped;
             if (fulladd[last].op != XOR) // the output wire is wrong
             {
@@ -170,8 +201,11 @@ int main(int argc, char * argv[])
                     {
                         swapped = c2.stro;
                         std::swap(c.stro, c2.stro);
-                        std::cout << "\t" << count++ << ": " << c2.stro << " = " << c2.stra << to_string((Op)c2.op) << c2.strb << std::endl;
-                        std::cout << "\t" << count++ << ": " << c.stro << " = " << c.stra << to_string((Op)c.op) << c.strb << std::endl;
+                        if constexpr (verbose)
+                        {
+                            std::cout << "\t" << count++ << ": " << c2.stro << " = " << c2.stra << to_string((Op)c2.op) << c2.strb << std::endl;
+                            std::cout << "\t" << count++ << ": " << c.stro << " = " << c.stra << to_string((Op)c.op) << c.strb << std::endl;
+                        }
                         fixed.insert(c2.stro);
                         fixed.insert(c.stro);
                         break;
@@ -190,7 +224,8 @@ int main(int argc, char * argv[])
                     if(j==last) continue;
                     else if (c2.stro == c.stra && c2.op != XOR)
                     {
-                        printf("\twrong input wire , id: %d\n", j);
+                        if constexpr (verbose)
+                            printf("\twrong input wire , id: %d\n", j);
                         wrong = true;
                         wrongid = j;
                     }
@@ -206,8 +241,11 @@ int main(int argc, char * argv[])
                     auto& c = fulladd[wrongid];
                     auto& c2 = fulladd[inputxor];
                     std::swap(c.stro, c2.stro);
-                    std::cout << "\t" << count++ << ": " << c2.stro << " = " << c2.stra << to_string((Op)c2.op) << c2.strb << std::endl;
-                    std::cout << "\t" << count++ << ": " << c.stro << " = " << c.stra << to_string((Op)c.op) << c.strb << std::endl;
+                    if constexpr (verbose)
+                    {
+                        std::cout << "\t" << count++ << ": " << c2.stro << " = " << c2.stra << to_string((Op)c2.op) << c2.strb << std::endl;
+                        std::cout << "\t" << count++ << ": " << c.stro << " = " << c.stra << to_string((Op)c.op) << c.strb << std::endl;
+                    }
                     fixed.insert(c2.stro);
                     fixed.insert(c.stro);
                 }
@@ -224,7 +262,8 @@ int main(int argc, char * argv[])
                     if(j==last) continue;
                     else if (c2.stro == c.strb && c2.op != XOR)
                     {
-                        printf("\twrong input wire , id: %d\n", j);
+                        if constexpr (verbose)
+                            printf("\twrong input wire , id: %d\n", j);
                         wrong = true;
                         wrongid = j;
                     }
@@ -240,8 +279,11 @@ int main(int argc, char * argv[])
                     auto& c = fulladd[wrongid];
                     auto& c2 = fulladd[inputxor];
                     std::swap(c.stro, c2.stro);
-                    std::cout << "\t" << count++ << ": " << c2.stro << " = " << c2.stra << to_string((Op)c2.op) << c2.strb << std::endl;
-                    std::cout << "\t" << count++ << ": " << c.stro << " = " << c.stra << to_string((Op)c.op) << c.strb << std::endl;
+                    if constexpr (verbose)
+                    {
+                        std::cout << "\t" << count++ << ": " << c2.stro << " = " << c2.stra << to_string((Op)c2.op) << c2.strb << std::endl;
+                        std::cout << "\t" << count++ << ": " << c.stro << " = " << c.stra << to_string((Op)c.op) << c.strb << std::endl;
+                    }
                     fixed.insert(c2.stro);
                     fixed.insert(c.stro);
                 }
@@ -249,14 +291,18 @@ int main(int argc, char * argv[])
 
             if (i>0 && fulladd.size()<5)
             {
-                printf("\t--- missing ---\n");
-                printf("\tswapped %s\n", swapped.c_str());
+                if constexpr (verbose)
+                {
+                    printf("\t--- missing ---\n");
+                    printf("\tswapped %s\n", swapped.c_str());
+                }
                 // find the missing command
                 for (const auto& c : ordered)
                 {
                     if (c.stra == swapped || c.strb == swapped)
                     {
-                        std::cout << "\t" << c.stro << " = " << c.stra << to_string((Op)c.op) << c.strb << std::endl;
+                        if constexpr (verbose)
+                            std::cout << "\t" << c.stro << " = " << c.stra << to_string((Op)c.op) << c.strb << std::endl;
                         fulladd.push_back(c);
                         map.erase(c.stro);
                     }
@@ -271,17 +317,22 @@ int main(int argc, char * argv[])
             fulladd.clear();
             fulladd = apply(commands, map);
             {
-                printf("\t--- fixed ---\n");
+                if constexpr (verbose)
+                    printf("\t--- fixed ---\n");
                 add.init(map[vx[i]], map[vy[i]], cin);
-                printf("\tci %d x %d y %d s %d co %d : z %d : %s\n",
-                    (int) cin
-                    ,(int) map[vx[i]]
-                    ,(int) map[vy[i]]
-                    ,(int) add.out()
-                    ,(int) add.carry()
-                    ,(int) map[vz[i]]
-                    , (map[vz[i]] == add.out() ? " correct" : " incorrect")
-                );
+
+                if constexpr (verbose)
+                {
+                    printf("\tci %d x %d y %d s %d co %d : z %d : %s\n",
+                        (int) cin
+                        ,(int) map[vx[i]]
+                        ,(int) map[vy[i]]
+                        ,(int) add.out()
+                        ,(int) add.carry()
+                        ,(int) map[vz[i]]
+                        , (map[vz[i]] == add.out() ? " correct" : " incorrect")
+                    );
+                }
             }
 
             if (map[vz[i]] != add.out())
@@ -303,13 +354,17 @@ int main(int argc, char * argv[])
         }
         return res;
     };
-    const size_t X = convert(xs);
-    const size_t Y = convert(ys);
     const size_t Z = convert(zs);
-    printf("X bits %zu\n", xs.size());
-    printf("Y bits %zu\n", ys.size());
-    printf("Z bits %zu\n", zs.size());
-    printf("%zu + %zu = %zu ; %zu\n", X, Y, X+Y, Z);
+
+    if constexpr (verbose)
+    {
+        const size_t X = convert(xs);
+        const size_t Y = convert(ys);
+        printf("X bits %zu\n", xs.size());
+        printf("Y bits %zu\n", ys.size());
+        printf("Z bits %zu\n", zs.size());
+        printf("%zu + %zu = %zu ; %zu\n", X, Y, X+Y, Z);
+    }
 
     // hell yeah, finally, ugliest entry so far, but it works !
     std::string str;
